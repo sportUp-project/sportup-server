@@ -53,7 +53,7 @@ router.put('/sports/:sportID', isAuthenticated, checkAdmin, (req, res) => {
 
 // Remove the sports from activity model and users
 //NEEDS TO BE CHECKED
-router.delete('/sports/:sportID', isAuthenticated,  (req,res) => {
+router.delete('/sports/:sportID', isAuthenticated, checkAdmin, (req,res) => {
     const { sportID } = req.params;
     if (!mongoose.Types.ObjectId.isValid(sportID)) {
         res.status(400).json({ message: 'Specified id is not valid' });

@@ -19,20 +19,19 @@ router.get('/activities', (req, res ) => {
 router.post('/activities', isAuthenticated, (req, res, next) => {
     const { name, description, duration, activityDate, location, sport } = req.body
     const createdBy = req.payload._id
-    console.log(createdBy)
+    //console.log(createdBy)
     if (name === '' || activityDate === '' || location === '') {
         res.status(400).json({ message: "Provide name, date and place." });
         return;
       } 
       Activity.create({ name, description, duration, activityDate, location, sport, createdBy, member: [], pictures: [] })
-        .then(activity => {                       
-            //console.log(activity.sport)
-            User.findByIdAndUpdate(activity.createdBy.valueOf(), { $push: { userActivities: activity._id }}, { new: true })
-            //.then((u)=> console.log('yy',u))
-            Sport.findByIdAndUpdate(activity.sport, { $push: { activities: activity._id }}, { new: true })
-            //.then((x)=> console.log('XX',x))
-            res.json(activity)
-        })
+        .then(activity => {               
+            return User.findByIdAndUpdate(createdBy, { $push: { userActivities: activity._id }}, { new: true })
+            .then (() => {
+                return Sport.findByIdAndUpdate(sport, { $push: { activities: activity._id }}, { new: true })
+            })          
+        })        
+        .then((response) => res.json(response))
         .catch(err => res.json(err));
 }) 
 
@@ -63,14 +62,14 @@ router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
                     res.status(401).json({ message: "Wrong credentials" });
                      return;
                 }
-                Sport.findByIdAndUpdate(foundActivity.sport, { $pull: { activities: activityID } }, {new: true} )
+                // Sport.findByIdAndUpdate(foundActivity.sport, { $pull: { activities: activityID } }, {new: true} )
                     //.then((res)=> console.log('yy', res ))
                 const { name, description, duration, activityDate, location, sport } = req.body
                 return Activity.findByIdAndUpdate( foundActivity._id, { name, description, duration, activityDate, location, sport }, {new: true})
                 .then ((updatedActivity) => {
-                    Sport.findByIdAndUpdate(updatedActivity.sport, { $push: { activities: updatedActivity._id }}, { new: true })
+                    // Sport.findByIdAndUpdate(updatedActivity.sport, { $push: { activities: updatedActivity._id }}, { new: true })
                        // .then((res)=> console.log('xxx', res ))
-                    res.json(updatedActivity)                   
+                    return res.json(updatedActivity)                   
                     
                 })
             })            
@@ -92,10 +91,11 @@ router.delete('/activities/:activityID', isAuthenticated, (req,res) => {
                 }
                 Activity.findByIdAndRemove(activityID)
                 .then((activity) => { 
-                    User.findByIdAndUpdate(activity.createdBy, { $pull: { userActivities: activityID } }, {new: true} )
-                    Sport.findByIdAndUpdate(activity.sport, { $pull: { activities: activityID } }, {new: true} )       
-                    res.json({message: `Activity '${activity.name}' (id: ${activity._id}) was successfully deleted`})        
-                })               
+                    return User.findByIdAndUpdate(activity.createdBy, { $pull: { userActivities: activityID } }, {new: true} )
+                    .then(() => Sport.findByIdAndUpdate(activity.sport, { $pull: { activities: activityID } }, {new: true} ) )
+                })
+                .then (() =>  res.json({message: `Activity was successfully deleted`}))           
+              
             })
             .catch(err => console.log(err))
 })
