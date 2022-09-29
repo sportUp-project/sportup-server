@@ -3,7 +3,7 @@ const User = require("../models/User.model");
 const fileUploader = require("../config/cloudinary.config");
 
 
-const { isAuthenticated } = require('./../middleware/jwt.middleware.js');
+const { isAuthenticated, checkAdmin } = require('./../middleware/jwt.middleware.js');
 const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
@@ -53,7 +53,7 @@ router.get('/:userId', isAuthenticated, (req,res, next) => {
 
 
 // Logic to delate te activites done by user needs to be added!
-router.delete('/:userId', (req,res) => {
+router.delete('/:userId', isAuthenticated, checkAdmin, (req,res) => {
     const { userId } = req.params;
     User.findByIdAndRemove(userId)
       .then(() => {      

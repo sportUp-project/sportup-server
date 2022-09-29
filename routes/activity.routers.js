@@ -46,7 +46,7 @@ router.get('/activities/:activityID', isAuthenticated, (req, res, next) => {
 
 
 router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
-    const {activityID} = req.params;
+    const { activityID } = req.params;
     if (!mongoose.Types.ObjectId.isValid(activityID)) {
         res.status(400).json({ message: 'Specified id is not valid' });
         return;
@@ -62,11 +62,29 @@ router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
                 .then ((updatedActivity) => res.json(updatedActivity))
             })            
             .catch(err => console.log(err))
-
 })
 
 
 
-//DELATE
+router.delete('/activities/:activityID', isAuthenticated, (req,res) => {
+    const { activityID } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(activityID)) {
+        res.status(400).json({ message: 'Specified id is not valid' });
+        return;
+    };
+    Activity.findById(activityID)
+            .then(foundActivity => {
+                if(foundActivity.createdBy.valueOf() !== req.payload._id && req.payload.isAdmin === false ) {
+                    res.status(401).json({ message: "Wrong credentials" });
+                     return;
+                }
+                Activity.findByIdAndRemove(activityID)
+                .then((activity) => {      
+                    res.json({message: `Sport ${activity.name} was successfully deleted`})        
+                })  
+              .catch(err => console.log(err))
+            })
+})
+
 
 module.exports = router;
