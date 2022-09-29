@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
+const fileUploader = require("../config/cloudinary.config");
 
 const { isAuthenticated } = require('./../middleware/jwt.middleware.js');
 
@@ -82,7 +83,13 @@ router.post('/login', (req,res,next) => {
 });
 
 router.get('/verify', isAuthenticated, (req,res,next) => {
+    
     res.status(200).json(req.payload);
 });
+
+
+
+
+
 
 module.exports = router;

@@ -22,6 +22,8 @@ app.use("/api", allRoutes);
 const authRouter = require("./routes/auth.routes");          
 app.use("/auth", authRouter);
 
+const profileRouter = require("./routes/profile.routers");          
+app.use("/profile", profileRouter);
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
 
