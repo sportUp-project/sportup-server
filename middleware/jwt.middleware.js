@@ -7,6 +7,8 @@ const isAuthenticated = jwt({
   getToken: getTokenFromHeaders
 });
 
+
+
 function getTokenFromHeaders (req) {
 
   if (req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
@@ -15,6 +17,10 @@ function getTokenFromHeaders (req) {
   }   
   return null;
 }
+
+const checkAdmin = (req, res, next) => {
+  req.payload.isAdmin === true ? next() : res.status(401).json({ message: "Wrong credentials" })
+}
  
 
-module.exports = { isAuthenticated }
+module.exports = { isAuthenticated, checkAdmin }

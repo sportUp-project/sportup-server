@@ -28,6 +28,9 @@ app.use("/profile", profileRouter);
 const activityRouter = require("./routes/activity.routers");          
 app.use("/api", activityRouter);
 
+const sportsRouter = require("./routes/sports.routers");          
+app.use("/api", sportsRouter);
+
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
 

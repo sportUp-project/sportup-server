@@ -44,7 +44,7 @@ router.get('/activities/:activityID', isAuthenticated, (req, res, next) => {
         .catch(err => console.log(err))
 })
 
-//PUT
+
 router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
     const {activityID} = req.params;
     if (!mongoose.Types.ObjectId.isValid(activityID)) {
@@ -62,9 +62,6 @@ router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
                 .then ((updatedActivity) => res.json(updatedActivity))
             })            
             .catch(err => console.log(err))
-    
-    
-    // AndUpdate(activityID, { name, description, duration, activityDate, location, sport, pictures: [] }, {new: true} )
 
 })
 
