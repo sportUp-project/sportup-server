@@ -1,6 +1,4 @@
 const express = require("express");
-const bcrypt = require('bcryptjs');
-const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const fileUploader = require("../config/cloudinary.config");
 
@@ -9,7 +7,7 @@ const { isAuthenticated } = require('./../middleware/jwt.middleware.js');
 const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
-const saltRounds = 10;
+
 
 
 router.post('/upload', fileUploader.single("image"), (req, res, next) => {
@@ -43,9 +41,15 @@ router.get('/:userId', isAuthenticated, (req,res, next) => {
         return;
     }
     User.findById(userId)
-        .then((user) => res.json(user))
+        .then((foundUser) =>  {
+            const { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities } = foundUser;
+            const user = { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities  };
+            res.status(201).json({ user: user });
+        })                
         .catch(err => next(err));
 })
+
+
 
 
 // Logic to delate te activites done by user needs to be added!
