@@ -8,9 +8,9 @@ const userSchema = new Schema(
     isAdmin: { type: Boolean, default: false },
     image: String,
     description: String,    
-    sports: [],
-    userActivities: [],
-    joinedActivities: []
+    sports: [{ type: Schema.Types.ObjectId, ref: 'Sport' }],
+    userActivities: [{ type: Schema.Types.ObjectId, ref: 'Activity' }],
+    joinedActivities: [{ type: Schema.Types.ObjectId, ref: 'Activity' }]
   },
   {
     timestamps: true,
