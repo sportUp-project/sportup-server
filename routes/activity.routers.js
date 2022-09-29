@@ -19,16 +19,22 @@ router.get('/activities', (req, res ) => {
 router.post('/activities', isAuthenticated, (req, res, next) => {
     const { name, description, duration, activityDate, location, sport } = req.body
     const createdBy = req.payload._id
-
+    console.log(createdBy)
     if (name === '' || activityDate === '' || location === '') {
         res.status(400).json({ message: "Provide name, date and place." });
         return;
-      }  
-// Need to add activity to the user        
-    Activity.create({ name, description, duration, activityDate, location, sport, createdBy, member: [], pictures: [] })
-            .then(activity => res.json(activity))
-            .catch(err => res.json(err));
-})
+      } 
+      Activity.create({ name, description, duration, activityDate, location, sport, createdBy, member: [], pictures: [] })
+        .then(activity => {                       
+            console.log(activity.sport)
+            User.findByIdAndUpdate(activity.createdBy.valueOf(), { $push: { userActivities: activity._id }}, { new: true })
+            //.then((u)=> console.log('yy',u))
+            Sport.findByIdAndUpdate(activity.sport, { $push: { activities: activity._id }}, { new: true })
+            //.then((x)=> console.log('XX',x))
+            res.json(activity)
+        })
+        .catch(err => res.json(err));
+}) 
 
 
 router.get('/activities/:activityID', isAuthenticated, (req, res, next) => {
@@ -57,14 +63,22 @@ router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
                     res.status(401).json({ message: "Wrong credentials" });
                      return;
                 }
+                Sport.findByIdAndUpdate(foundActivity.sport, { $pull: { activities: activityID } }, {new: true} )
+                    //.then((res)=> console.log('yy', res ))
                 const { name, description, duration, activityDate, location, sport } = req.body
                 return Activity.findByIdAndUpdate( foundActivity._id, { name, description, duration, activityDate, location, sport }, {new: true})
-                .then ((updatedActivity) => res.json(updatedActivity))
+                .then ((updatedActivity) => {
+                    Sport.findByIdAndUpdate(updatedActivity.sport, { $push: { activities: updatedActivity._id }}, { new: true })
+                       // .then((res)=> console.log('xxx', res ))
+                    res.json(updatedActivity)                   
+                    
+                })
             })            
             .catch(err => console.log(err))
 })
 
 
+// Remove the activity from User model and Sports
 
 router.delete('/activities/:activityID', isAuthenticated, (req,res) => {
     const { activityID } = req.params;
@@ -79,11 +93,13 @@ router.delete('/activities/:activityID', isAuthenticated, (req,res) => {
                      return;
                 }
                 Activity.findByIdAndRemove(activityID)
-                .then((activity) => {      
-                    res.json({message: `Sport ${activity.name} was successfully deleted`})        
-                })  
-              .catch(err => console.log(err))
+                .then((activity) => { 
+                    User.findByIdAndUpdate(activity.createdBy, { $pull: { userActivities: activityID } }, {new: true} )
+                    Sport.findByIdAndUpdate(activity.sport, { $pull: { activities: activityID } }, {new: true} )       
+                    res.json({message: `Activity '${activity.name}' (id: ${activity._id}) was successfully deleted`})        
+                })               
             })
+            .catch(err => console.log(err))
 })
 
 

@@ -45,12 +45,13 @@ router.put('/sports/:sportID', isAuthenticated, checkAdmin, (req, res) => {
         res.status(400).json({ message: 'Specified id is not valid' });
         return;
     }; 
-
     const { name, iconUrl, imageUrl } = req.body
     Sport.findByIdAndUpdate(sportID, { name, iconUrl, imageUrl }, { new: true })
         .then(updatedSport => res.json(updatedSport))
         .catch(err => console.log(err))
 })
+
+// Remove the sports from activity model and users
 
 router.delete('/sports/:sportID', isAuthenticated, checkAdmin, (req,res) => {
     const { sportID } = req.params;

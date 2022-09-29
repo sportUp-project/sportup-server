@@ -52,7 +52,7 @@ router.get('/:userId', isAuthenticated, (req,res, next) => {
 
 
 
-// Logic to delate te activites done by user needs to be added!
+// Logic to delate the activites done by user needs to be added!
 router.delete('/:userId', isAuthenticated, checkAdmin, (req,res) => {
     const { userId } = req.params;
     User.findByIdAndRemove(userId)
