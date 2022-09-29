@@ -22,8 +22,8 @@ router.post('/sports', isAuthenticated, checkAdmin, (req, res, next) => {
         return;
       }   
     Sport.create({ name, iconUrl, imageUrl, activities: [] })
-            .then(sport => res.json(sport))
-            .catch(err => res.json(err));
+        .then(sport => res.json(sport))
+        .catch(err => res.json(err));
 })
 
 router.get('/sports/:sportID', (req, res ) => {
@@ -52,15 +52,23 @@ router.put('/sports/:sportID', isAuthenticated, checkAdmin, (req, res) => {
 })
 
 // Remove the sports from activity model and users
-
-router.delete('/sports/:sportID', isAuthenticated, checkAdmin, (req,res) => {
+//NEEDS TO BE CHECKED
+router.delete('/sports/:sportID', isAuthenticated,  (req,res) => {
     const { sportID } = req.params;
     if (!mongoose.Types.ObjectId.isValid(sportID)) {
         res.status(400).json({ message: 'Specified id is not valid' });
         return;
     };
     Sport.findByIdAndRemove(sportID)
-      .then((sport) => {      
+      .then((sport) => {
+            User.updateMany({ sports: { $in: sportID }}, { $pull: { userActivities: activityID }})
+                .then((response) => console.log(`Updated ${response.modifiedCount} Users`))                
+            
+           // User.findByIdAndUpdate(sport.createdBy, { $pull: { userActivities: activityID } }, {new: true} )
+            Activity.deleteMany({sport: sportID})
+                    .then(response => {
+                        console.log(`Removed ${response.deletedCount} activities`)
+                    })       
             res.json({message: `Sport ${sport.name} was successfully deleted`})        
         })  
       .catch(err => console.log(err))

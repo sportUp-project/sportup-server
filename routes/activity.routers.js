@@ -26,7 +26,7 @@ router.post('/activities', isAuthenticated, (req, res, next) => {
       } 
       Activity.create({ name, description, duration, activityDate, location, sport, createdBy, member: [], pictures: [] })
         .then(activity => {                       
-            console.log(activity.sport)
+            //console.log(activity.sport)
             User.findByIdAndUpdate(activity.createdBy.valueOf(), { $push: { userActivities: activity._id }}, { new: true })
             //.then((u)=> console.log('yy',u))
             Sport.findByIdAndUpdate(activity.sport, { $push: { activities: activity._id }}, { new: true })
@@ -77,8 +77,6 @@ router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
             .catch(err => console.log(err))
 })
 
-
-// Remove the activity from User model and Sports
 
 router.delete('/activities/:activityID', isAuthenticated, (req,res) => {
     const { activityID } = req.params;
