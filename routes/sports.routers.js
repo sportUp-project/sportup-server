@@ -51,25 +51,32 @@ router.put('/sports/:sportID', isAuthenticated, checkAdmin, (req, res) => {
         .catch(err => console.log(err))
 })
 
-// Remove the sports from activity model and users
-//NEEDS TO BE CHECKED
+
+router.delete("/sports/test",  (req,res) => {  
+    const sportID = "6336ac753d002b071d67115f"
+    User.find({sports:sportID}).then((users)=> res.json(users))
+
+})
 router.delete('/sports/:sportID', isAuthenticated, checkAdmin, (req,res) => {
     const { sportID } = req.params;
+    console.log(sportID)
     if (!mongoose.Types.ObjectId.isValid(sportID)) {
         res.status(400).json({ message: 'Specified id is not valid' });
         return;
     };
     Sport.findByIdAndRemove(sportID)
       .then((sport) => {
-            User.updateMany({ sports: { $in: sportID }}, { $pull: { userActivities: activityID }})
-                .then((response) => console.log(`Updated ${response.modifiedCount} Users`))                
+        const updateUser = User.updateMany({ sports: sportID }, { $pull: { sports: sportID  }})  //{ $pull: { userActivities: sport.activities }}
+           //  .then((response) => console.log(`Updated ${response.modifiedCount} Users`))                
             
            // User.findByIdAndUpdate(sport.createdBy, { $pull: { userActivities: activityID } }, {new: true} )
-            Activity.deleteMany({sport: sportID})
-                    .then(response => {
-                        console.log(`Removed ${response.deletedCount} activities`)
-                    })       
-            res.json({message: `Sport ${sport.name} was successfully deleted`})        
+        const updateActivity = Activity.deleteMany({sport: sportID})
+                    //.then(response => {
+                     //   console.log(`Removed ${response.deletedCount} activities`)
+                    //
+            return Promise.all([updateUser, updateActivity])
+                            .then (() => res.json({message: `Sport  was successfully deleted`}))
+                    
         })  
       .catch(err => console.log(err))
 })
