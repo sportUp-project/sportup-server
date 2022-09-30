@@ -1,5 +1,7 @@
 const express = require("express");
 const User = require("../models/User.model");
+const Activity = require("../models/Activity.model");
+const Sport = require ("../models/Sport.model")
 const fileUploader = require("../config/cloudinary.config");
 
 
@@ -53,12 +55,23 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
 })
 
 
-// Logic to delate the activites done by user needs to be added!
-router.delete('/:userId', isAuthenticated, checkAdmin, (req,res) => {
+// Delate the users arctivities from another joinedactivities and sport
+router.delete('/:userId', isAuthenticated,  (req,res) => {
     const { userId } = req.params;
     User.findByIdAndRemove(userId)
-      .then(() => {      
-            res.json({message:  `User was successfully deleted`})        
+      .then((user) => { 
+            //console.log(user.userActivities)
+            const removeActivities = Activity.deleteMany( {_id: user.userActivities } )
+            
+            const sportActivities = user.userActivities.map(activity => {
+                //console.log(activity)
+                Sport.findOneAndUpdate({ activities: activity } , { $pull: { activities: activity } }) 
+                    .then((s) => console.log(s)) // 
+            })
+
+            return Promise.all([removeActivities, sportActivities])
+                .then (() => res.json({message:  `User was successfully deleted`}))
+           
         })  
       .catch(err => console.log(err))
   })

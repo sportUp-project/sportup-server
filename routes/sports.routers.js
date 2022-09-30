@@ -51,8 +51,6 @@ router.put('/sports/:sportID', isAuthenticated, checkAdmin, (req, res) => {
         .catch(err => console.log(err))
 })
 
-// Remove the sports from activity model and users
-//NEEDS TO BE CHECKED
 
 router.delete("/sports/test",  (req,res) => {  
     const sportID = "6336ac753d002b071d67115f"
@@ -68,10 +66,8 @@ router.delete('/sports/:sportID', isAuthenticated, checkAdmin, (req,res) => {
     };
     Sport.findByIdAndRemove(sportID)
       .then((sport) => {
-        console.log(sport._id)
         const updateUser = User.updateMany({ sports: sportID }, { $pull: { sports: sportID  }})  //{ $pull: { userActivities: sport.activities }}
-
-                //  .then((response) => console.log(`Updated ${response.modifiedCount} Users`))                
+           //  .then((response) => console.log(`Updated ${response.modifiedCount} Users`))                
             
            // User.findByIdAndUpdate(sport.createdBy, { $pull: { userActivities: activityID } }, {new: true} )
         const updateActivity = Activity.deleteMany({sport: sportID})
