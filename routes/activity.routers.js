@@ -20,19 +20,30 @@ router.post('/activities', isAuthenticated, (req, res, next) => {
     const { name, description, duration, activityDate, location, sport } = req.body
     const createdBy = req.payload._id
     //console.log(createdBy)
-    if (name === '' || activityDate === '' || location === '') {
+    if (name === '' || activityDate === '') {
         res.status(400).json({ message: "Provide name, date and place." });
         return;
       } 
-      Activity.create({ name, description, duration, activityDate, location, sport, createdBy, member: [], pictures: [] })
-        .then(activity => {               
-            return User.findByIdAndUpdate(createdBy, { $push: { userActivities: activity._id }}, { new: true })
-            .then (() => {
-                return Sport.findByIdAndUpdate(sport, { $push: { activities: activity._id }}, { new: true })
-            })          
-        })        
-        .then((response) => res.json(response))
-        .catch(err => res.json(err));
+    //   Activity.create({ name, description, duration, activityDate, location, sport, createdBy, member: [], pictures: [] })
+    //     .then(activity => {               
+    //         return User.findByIdAndUpdate(createdBy, { $push: { userActivities: activity._id }}, { new: true })
+    //         .then (() => {
+    //             return Sport.findByIdAndUpdate(sport, { $push: { activities: activity._id }}, { new: true })
+    //         })          
+    //     })        
+    //     .then((response) => res.json(response))
+    //     .catch(err => res.json(err));
+    async function createActivity() {
+        try {
+            const activityCreated = await Activity.create({ name, description, duration, activityDate, location, sport, createdBy, member: [], pictures: [] })
+            const userUpdated = await User.findByIdAndUpdate(createdBy, { $push: { userActivities: activityCreated._id }}, { new: true })
+            const sportUpdated = await Sport.findByIdAndUpdate(sport, { $push: { activities: activityCreated._id }}, { new: true })
+            res.json(activityCreated)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    createActivity()
 }) 
 
 

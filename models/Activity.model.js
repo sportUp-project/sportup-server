@@ -10,7 +10,7 @@ const activitySchema = new Schema(
     duration: String,
     activityDate: String,
     members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    location: String,
+    location: {},
     pictures:  [{ type: String}]
   },
   {
