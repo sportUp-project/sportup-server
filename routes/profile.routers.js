@@ -55,8 +55,8 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
 })
 
 
-// Delate the users arctivities from another joinedactivities and sport
-router.delete('/:userId', isAuthenticated,  (req,res) => {
+// Delate the users arctivities from another users joinedactivities
+router.delete('/:userId', isAuthenticated, checkAdmin,  (req,res) => {
     const { userId } = req.params;
     User.findByIdAndRemove(userId)
       .then((user) => { 
