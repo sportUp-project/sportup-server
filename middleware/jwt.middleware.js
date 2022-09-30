@@ -19,7 +19,7 @@ function getTokenFromHeaders (req) {
 }
 
 const checkAdmin = (req, res, next) => {
-  req.payload.isAdmin === true ? next() : res.status(401).json({ message: "Wrong credentials" })
+   return req.payload.isAdmin === true ? next() : res.status(401).json({ message: "Wrong credentials" })
 }
  
 
