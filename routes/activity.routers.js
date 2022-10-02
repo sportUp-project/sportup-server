@@ -82,6 +82,24 @@ router.get('/activities/:activityID/join', isAuthenticated, async (req,res,next)
 
 })
 
+// router for leaving an activity
+
+router.get('/activities/activityID/leave', isAuthenticated, async (req,res,next) => {
+    const {activityID} = req.params
+    const leftBy = req.payload._id
+    if (!mongoose.Types.ObjectId.isValid(activityID)) {
+        res.status(400).json({ message: 'Specified id is not valid' });
+        return;
+    };   
+    try {
+        const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$pull: {members: leftBy}}, {new:true})
+        const updatedUser = await User.findByIdAndUpdate(leftBy, {$pull : {joinedActivities : activityID}})
+        res.json(updatedActivity)
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
     const { activityID } = req.params;
     if (!mongoose.Types.ObjectId.isValid(activityID)) {
