@@ -75,6 +75,18 @@ router.delete('/:userId', isAuthenticated, checkAdmin,  (req,res) => {
         })  
       .catch(err => console.log(err))
   })
-
+ //path to add to a friend when in the other user profile
+  router.put('/:userId/follow', isAuthenticated, (req,res, next) => {
+    const { userId } = req.params;
+    const authID = req.payload._id;
+    if ( userId === authID ) {
+        res.status(400).json({message: `Logged user-wrong request`})
+        return;
+    }
+    User.findOneAndUpdate( {$and: [ {_id: authID},{ follows: { $ne: userId  } }] }
+    , { $push: {follows: userId}}, {new: true})
+        .then ((response) => res.json(response))
+        .catch(err => console.log(err))
+})
 
 module.exports = router;
