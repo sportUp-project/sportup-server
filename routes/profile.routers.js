@@ -70,7 +70,7 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
     User.findByIdAndUpdate(  authID , { $push: {follows: userId}}, {new: true})
     .then (() => {
        User.findByIdAndUpdate( userId , { $push: {followers: authID}}, {new: true})
-           .then((response) => res.json(response))
+           .then(() => res.json({ message: "Conntact updated" }))
        })
     .catch(err => console.log(err))
 })
@@ -91,7 +91,7 @@ router.put('/:userId/unfollow',  (req,res, next) => {
      User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
          .then (() => {
             User.findByIdAndUpdate( userId , { $pull: {followers: authID}}, {new: true})
-                .then((response) => res.json(response))
+                .then(() => res.json({ message: "Conntact updated" }))
             })
          .catch(err => console.log(err))
 })
