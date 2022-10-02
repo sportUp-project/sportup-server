@@ -55,7 +55,8 @@ router.get('/activities/:activityID', isAuthenticated, (req, res, next) => {
     }
 
     Activity.findById(activityID)
-        .populate('createdBy sport members')
+        .populate('createdBy', '_id name')
+        .populate('sport members')
         .then(activity => res.json(activity))
         .catch(err => console.log(err))
 })
