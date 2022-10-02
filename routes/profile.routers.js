@@ -58,7 +58,7 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
  // AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
  router.put('/:userId/follow',  (req,res, next) => {
     const { userId } = req.params;
-    const authID = '633988f054ff23a2c0113c5a'; //req.payload._id
+    const authID = '6339ad9ffba1616dbdaf20c0'; //req.payload._id
     if (!mongoose.Types.ObjectId.isValid(userId)) {
         res.status(400).json({ message: "User do not exist" });
         return;
@@ -67,16 +67,18 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
         res.status(400).json({message: `Logged user-wrong request`})
         return;
     }
-
-     User.findOneAndUpdate( {$and: [ {_id: authID},{ follows: { $ne: userId  } }] }, { $push: {follows: userId}}, {new: true})
-         .then ((response) => res.json(response))
-         .catch(err => console.log(err))
+    User.findByIdAndUpdate(  authID , { $push: {follows: userId}}, {new: true})
+    .then (() => {
+       User.findByIdAndUpdate( userId , { $push: {followers: authID}}, {new: true})
+           .then((response) => res.json(response))
+       })
+    .catch(err => console.log(err))
 })
- //path to remove to a friend when in the other user profil
+ //path to add to a friend when in the other user profil
  // AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
 router.put('/:userId/unfollow',  (req,res, next) => {
     const { userId } = req.params;
-    const authID = '633988f054ff23a2c0113c5a'; //req.payload._id
+    const authID = '6339ad9ffba1616dbdaf20c0'; //req.payload._id
     if (!mongoose.Types.ObjectId.isValid(userId)) {
         res.status(400).json({ message: "User do not exist" });
         return;
@@ -87,7 +89,10 @@ router.put('/:userId/unfollow',  (req,res, next) => {
     }
 
      User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
-         .then ((response) => res.json(response))
+         .then (() => {
+            User.findByIdAndUpdate( userId , { $pull: {followers: authID}}, {new: true})
+                .then((response) => res.json(response))
+            })
          .catch(err => console.log(err))
 })
 

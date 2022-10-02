@@ -11,7 +11,8 @@ const userSchema = new Schema(
     sports: [{ type: Schema.Types.ObjectId, ref: 'Sport' }],
     userActivities: [{ type: Schema.Types.ObjectId, ref: 'Activity' }],
     joinedActivities: [{ type: Schema.Types.ObjectId, ref: 'Activity' }],
-    follows: [{type: Schema.Types.ObjectId, ref: 'User'}]
+    follows: [{type: Schema.Types.ObjectId, ref: 'User'}],
+    followers: [{type: Schema.Types.ObjectId, ref: 'User'}]
   },
   {
     timestamps: true,
