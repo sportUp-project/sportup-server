@@ -62,6 +62,25 @@ router.get('/activities/:activityID', isAuthenticated, (req, res, next) => {
         .catch(err => console.log(err))
 })
 
+// router for joining an activity;
+
+router.get('/activities/:activityID/join', isAuthenticated, async (req,res,next) => {
+    const {activityID} = req.params
+    const joinedBy = req.payload._id
+    if (!mongoose.Types.ObjectId.isValid(activityID)) {
+        res.status(400).json({ message: 'Specified id is not valid' });
+        return;
+    };    
+
+    try {
+        const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$push: {members : joinedBy}}, { new:true })
+        const updatedUser = await User.findByIdAndUpdate(joinedBy, {$push: {joinedActivities : activityID}})
+        res.json(updatedActivity)
+    } catch (error) {
+        console.log(error)
+    }
+
+})
 
 router.put('/activities/:activityID', isAuthenticated, (req, res, next) => {
     const { activityID } = req.params;
