@@ -52,11 +52,11 @@ router.put('/sports/:sportID', isAuthenticated, checkAdmin, (req, res) => {
 })
 
 
-router.delete("/sports/test",  (req,res) => {  
-    const sportID = "6336ac753d002b071d67115f"
-    User.find({sports:sportID}).then((users)=> res.json(users))
+// router.delete("/sports/test",  (req,res) => {  
+//     const sportID = "6336ac753d002b071d67115f"
+//     User.find({sports:sportID}).then((users)=> res.json(users))
 
-})
+// })
 router.delete('/sports/:sportID', isAuthenticated, checkAdmin, (req,res) => {
     const { sportID } = req.params;
     console.log(sportID)

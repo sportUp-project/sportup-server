@@ -54,6 +54,43 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
       .catch(err => next(err));
 })
 
+ //path to add to a friend when in the other user profil
+ // AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
+ router.put('/:userId/follow',  (req,res, next) => {
+    const { userId } = req.params;
+    const authID = '633988f054ff23a2c0113c5a'; //req.payload._id
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        res.status(400).json({ message: "User do not exist" });
+        return;
+    }
+    if ( userId === authID ) {
+        res.status(400).json({message: `Logged user-wrong request`})
+        return;
+    }
+
+     User.findOneAndUpdate( {$and: [ {_id: authID},{ follows: { $ne: userId  } }] }, { $push: {follows: userId}}, {new: true})
+         .then ((response) => res.json(response))
+         .catch(err => console.log(err))
+})
+ //path to remove to a friend when in the other user profil
+ // AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
+router.put('/:userId/unfollow',  (req,res, next) => {
+    const { userId } = req.params;
+    const authID = '633988f054ff23a2c0113c5a'; //req.payload._id
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        res.status(400).json({ message: "User do not exist" });
+        return;
+    }
+    if ( userId === authID ) {
+        res.status(400).json({message: `Logged user-wrong request`})
+        return;
+    }
+
+     User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
+         .then ((response) => res.json(response))
+         .catch(err => console.log(err))
+})
+
 
 // Delate the users arctivities from another users joinedactivities
 router.delete('/:userId', isAuthenticated, checkAdmin,  (req,res) => {
@@ -75,18 +112,6 @@ router.delete('/:userId', isAuthenticated, checkAdmin,  (req,res) => {
         })  
       .catch(err => console.log(err))
   })
- //path to add to a friend when in the other user profile
-  router.put('/:userId/follow', isAuthenticated, (req,res, next) => {
-    const { userId } = req.params;
-    const authID = req.payload._id;
-    if ( userId === authID ) {
-        res.status(400).json({message: `Logged user-wrong request`})
-        return;
-    }
-    User.findOneAndUpdate( {$and: [ {_id: authID},{ follows: { $ne: userId  } }] }
-    , { $push: {follows: userId}}, {new: true})
-        .then ((response) => res.json(response))
-        .catch(err => console.log(err))
-})
+
 
 module.exports = router;
