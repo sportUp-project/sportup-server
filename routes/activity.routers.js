@@ -10,7 +10,8 @@ const { isAuthenticated } = require('./../middleware/jwt.middleware.js');
 
 router.get('/activities', (req, res ) => {
     Activity.find()
-        .populate('createdBy sport members')
+        .populate('createdBy', '_id name')
+        .populate('sport members')
         .then(activities => res.json(activities))
         .catch(err => console.log(err))
 })
