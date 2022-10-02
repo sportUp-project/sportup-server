@@ -26,12 +26,12 @@ router.get('/:userId', isAuthenticated, (req,res, next) => {
         res.status(400).json({ message: "User do not exist" });
         return;
     }
-    User.findById(userId).populate('userActivities joinedActivities')
+    User.findById(userId).populate('userActivities joinedActivities follows followers')
         .then((foundUser) =>  {            
-            const { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities } = foundUser;
-            const user = { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities  };
+            const { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities, follows, followers } = foundUser;
+            const user = { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities, follows, followers  };
             res.status(201).json({ user: user });
-        })                
+        })               
         .catch(err => next(err));
 })
 
