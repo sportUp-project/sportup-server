@@ -9,7 +9,7 @@ const router = express.Router();
 const saltRounds = 10;
 
 router.post('/signup', (req,res,next) => {
-    const { email, password, name } = req.body;
+    const { email, password, name, } = req.body;
   
     if (email === '' || password === '' || name === '') {
       res.status(400).json({ message: "Provide email, password and name" });
@@ -34,7 +34,7 @@ router.post('/signup', (req,res,next) => {
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
       // console.log({ email, password: hashedPassword, name })
-      return User.create({ email, password: hashedPassword, name });
+      return User.create({ email, password: hashedPassword, name, image: 'https://res.cloudinary.com/dxc2oj7lt/image/upload/v1664812327/sportUp-users-gallery/pngfind.com-default-image-png-6764065_ciulpf.png' });
     })
     .then((createdUser) => {
       const { email, name, _id } = createdUser;
