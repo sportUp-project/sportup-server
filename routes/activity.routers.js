@@ -38,7 +38,7 @@ router.post('/activities', isAuthenticated, (req, res, next) => {
     //     .catch(err => res.json(err));
     async function createActivity() {
         try {
-            const activityCreated = await Activity.create({ name, description, duration, activityDate, location, sport, createdBy, members: createdBy , pictures: [] })
+            const activityCreated = await Activity.create({ name, description, duration, activityDate, location, sport, createdBy, members: mongoose.Types.ObjectId(createdBy) , pictures: [] })
             const userUpdated = await User.findByIdAndUpdate(createdBy, { $push: { userActivities: activityCreated._id }}, { new: true })
             const sportUpdated = await Sport.findByIdAndUpdate(sport, { $push: { activities: activityCreated._id }}, { new: true })
             res.json(activityCreated)
