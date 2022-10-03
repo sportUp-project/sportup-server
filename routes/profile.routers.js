@@ -100,8 +100,11 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
     }
     User.findByIdAndUpdate(  authID , { $push: {follows: userId}}, {new: true})
     .then (() => {
-       User.findByIdAndUpdate( userId , { $push: {followers: authID}}, {new: true})
-           .then(() => res.json({ message: "Conntact updated" }))
+        User.findByIdAndUpdate( userId , { $push: {followers: authID}}, {new: true})        
+            .populate('followers')
+            .then((updatedUser) => {                                
+                res.json(updatedUser)
+            })
        })
     .catch(err => console.log(err))
 })
@@ -118,10 +121,11 @@ router.put('/:userId/unfollow', isAuthenticated, (req,res, next) => {
         res.status(400).json({message: `Logged user-wrong request`})
         return;
     }
-    User.findByIdAndUpdate( userId , { $pull: {followers: authID}}, {new: true})
+    User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
          .then (() => {
-            User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
-                .then(() => res.json({ message: "Conntact updated" }))
+            User.findByIdAndUpdate( userId , { $pull: {followers: authID}}, {new: true})
+                .populate('followers')
+                .then((updatedUser) => res.json(updatedUser))
             })
          .catch(err => console.log(err))
 })
