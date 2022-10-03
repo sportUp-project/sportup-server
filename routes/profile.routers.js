@@ -47,7 +47,7 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
     }
     const {name, image, description, sports } = req.body
     console.log(req.body)
-    const convertedSposrts = sports.split(' ').map(sport => mongoose.Types.ObjectId(sport))
+    const convertedSposrts = sports.map(sport => mongoose.Types.ObjectId(sport))
     //const dbSport = Sports.findOne({ sports  }) // { _id,  }
     User.findByIdAndUpdate(userId, {name, image, description, sports: convertedSposrts  }, { new: true })
       .then((updatedUser) => res.json(updatedUser))
