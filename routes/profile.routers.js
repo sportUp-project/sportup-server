@@ -26,10 +26,41 @@ router.get('/:userId', isAuthenticated, (req,res, next) => {
         res.status(400).json({ message: "User do not exist" });
         return;
     }
-    User.findById(userId).populate('userActivities joinedActivities follows followers sports')
+    User.findById(userId).populate('userActivities joinedActivities sports').populate('follows','_id image name').populate('followers','_id image name' )
         .then((foundUser) =>  {            
             const { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities, follows, followers } = foundUser;
             const user = { email, name, _id, isAdmin, image, description, sports, userActivities, joinedActivities, follows, followers  };
+            res.status(201).json({ user: user });
+        })               
+        .catch(err => next(err));
+})
+
+router.get('/:userId/following', isAuthenticated, (req,res, next) => {
+    const { userId  } = req.params
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        res.status(400).json({ message: "User do not exist" });
+        return;
+    }
+    User.findById(userId)
+        .populate('follows', '_id name image sports userActivities joinedActivities')
+        .populate({
+            path: 'follows', 
+            populate: [{ 
+                path: 'sports',
+                model: 'Sport' 
+            },
+            { 
+                path: 'joinedActivities',
+                model: 'Activity' 
+            },
+            { 
+                path: 'userActivities',
+                model: 'Activity' 
+            }       
+        ]})
+        .then((foundUser) =>  {            
+            const { email, name, _id, isAdmin, image, follows, followers, sports, userActivities, joinedActivities } = foundUser;
+            const user = { email, name, _id, isAdmin, image, follows, followers, sports, userActivities, joinedActivities };
             res.status(201).json({ user: user });
         })               
         .catch(err => next(err));
@@ -76,21 +107,20 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
 })
  //path to add to a friend when in the other user profil
  // AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
-router.put('/:userId/unfollow',  (req,res, next) => {
+router.put('/:userId/unfollow', isAuthenticated, (req,res, next) => {
     const { userId } = req.params;
-    const authID = '6339ad9ffba1616dbdaf20c0'; //req.payload._id
+    const authID = req.payload._id; //req.payload._id
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        res.status(400).json({ message: "User do not exist" });
-        return;
-    }
+         res.status(400).json({ message: "User do not exist" });
+         return;
+     }
     if ( userId === authID ) {
         res.status(400).json({message: `Logged user-wrong request`})
         return;
     }
-
-     User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
+    User.findByIdAndUpdate( userId , { $pull: {followers: authID}}, {new: true})
          .then (() => {
-            User.findByIdAndUpdate( userId , { $pull: {followers: authID}}, {new: true})
+            User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
                 .then(() => res.json({ message: "Conntact updated" }))
             })
          .catch(err => console.log(err))
