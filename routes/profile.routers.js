@@ -54,6 +54,48 @@ router.put('/:userId', isAuthenticated, (req,res, next) => {
       .catch(err => next(err));
 })
 
+ //path to add to a friend when in the other user profil
+ // AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
+ router.put('/:userId/follow',  (req,res, next) => {
+    const { userId } = req.params;
+    const authID = '6339ad9ffba1616dbdaf20c0'; //req.payload._id
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        res.status(400).json({ message: "User do not exist" });
+        return;
+    }
+    if ( userId === authID ) {
+        res.status(400).json({message: `Logged user-wrong request`})
+        return;
+    }
+    User.findByIdAndUpdate(  authID , { $push: {follows: userId}}, {new: true})
+    .then (() => {
+       User.findByIdAndUpdate( userId , { $push: {followers: authID}}, {new: true})
+           .then(() => res.json({ message: "Conntact updated" }))
+       })
+    .catch(err => console.log(err))
+})
+ //path to add to a friend when in the other user profil
+ // AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
+router.put('/:userId/unfollow',  (req,res, next) => {
+    const { userId } = req.params;
+    const authID = '6339ad9ffba1616dbdaf20c0'; //req.payload._id
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        res.status(400).json({ message: "User do not exist" });
+        return;
+    }
+    if ( userId === authID ) {
+        res.status(400).json({message: `Logged user-wrong request`})
+        return;
+    }
+
+     User.findByIdAndUpdate(  authID , { $pull: {follows: userId}}, {new: true})
+         .then (() => {
+            User.findByIdAndUpdate( userId , { $pull: {followers: authID}}, {new: true})
+                .then(() => res.json({ message: "Conntact updated" }))
+            })
+         .catch(err => console.log(err))
+})
+
 
 // Delate the users arctivities from another users joinedactivities
 router.delete('/:userId', isAuthenticated, checkAdmin,  (req,res) => {
