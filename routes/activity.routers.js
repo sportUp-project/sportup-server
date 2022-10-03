@@ -73,7 +73,7 @@ router.get('/activities/:activityID/join', isAuthenticated, async (req,res,next)
     };    
 
     try {
-        const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$push: {members : joinedBy}}, { new:true })
+        const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$push: {members : joinedBy}}, { new:true }).populate('members', '_id name')
         const updatedUser = await User.findByIdAndUpdate(joinedBy, {$push: {joinedActivities : activityID}},{new:true})
         res.json(updatedActivity)
     } catch (error) {
@@ -92,7 +92,7 @@ router.get('/activities/:activityID/leave', isAuthenticated, async (req,res,next
         return;
     };   
     try {
-        const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$pull: {members: leftBy}}, {new:true})
+        const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$pull: {members: leftBy}}, {new:true}).populate('members', '_id name')
         const updatedUser = await User.findByIdAndUpdate(leftBy, {$pull : {joinedActivities : activityID}})
         res.json(updatedActivity)
     } catch (error) {
