@@ -10,8 +10,8 @@ const { isAuthenticated } = require('./../middleware/jwt.middleware.js');
 
 router.get('/activities', (req, res ) => {
     Activity.find()
-        .populate('createdBy', '_id name')
-        .populate('members','_id name')
+        .populate('createdBy', '_id name image')
+        .populate('members','_id name image')
         .populate('sport')
         .then(activities => res.json(activities))
         .catch(err => console.log(err))
@@ -60,9 +60,9 @@ router.get('/activities/:activityID', isAuthenticated, (req, res, next) => {
     }
 
     Activity.findById(activityID)
-        .populate('createdBy', '_id name')
+        .populate('createdBy', '_id name image')
         .populate('sport')
-        .populate('members', '_id name')
+        .populate('members', '_id name image')
         .then(activity => res.json(activity))
         .catch(err => console.log(err))
 })
@@ -100,7 +100,7 @@ router.get('/activities/:activityID/join', isAuthenticated, async (req,res,next)
 
     try {
         const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$push: {members : joinedBy}}, { new:true })
-        .populate('members', '_id name')
+        .populate('members', '_id name image')
         .populate('createdBy')
         const updatedUser = await User.findByIdAndUpdate(joinedBy, {$push: {joinedActivities : activityID}},{new:true})
         res.json(updatedActivity)
@@ -121,7 +121,7 @@ router.get('/activities/:activityID/leave', isAuthenticated, async (req,res,next
     };   
     try {
         const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$pull: {members: leftBy}}, {new:true})
-        .populate('members', '_id name')
+        .populate('members', '_id name image')
         .populate('createdBy')
         const updatedUser = await User.findByIdAndUpdate(leftBy, {$pull : {joinedActivities : activityID}})
         res.json(updatedActivity)
