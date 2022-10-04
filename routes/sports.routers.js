@@ -18,7 +18,7 @@ router.get('/sports', (req, res ) => {
 router.post('/sports', isAuthenticated, checkAdmin, (req, res, next) => {
     const { name, iconUrl, imageUrl } = req.body
     if (name === '' || iconUrl === '' || imageUrl === '') {
-        res.status(400).json({ message: "Provide name, date and place." });
+        res.status(400).json({ message: "Provide name." });
         return;
       }   
     Sport.create({ name, iconUrl, imageUrl, activities: [] })
