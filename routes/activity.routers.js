@@ -75,6 +75,7 @@ router.get('/activities/:activityID/edit', isAuthenticated, (req,res,next) => {
         return;
     };   
     Activity.findById(activityID)
+    .populate('members', '_id name image')
     .then(foundActivity => {
         if(foundActivity.createdBy.valueOf() !== req.payload._id) {
             res.status(401).json({ message: "Wrong credentials" });
@@ -101,7 +102,8 @@ router.get('/activities/:activityID/join', isAuthenticated, async (req,res,next)
     try {
         const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$push: {members : joinedBy}}, { new:true })
         .populate('members', '_id name image')
-        .populate('createdBy')
+        .populate('sport')
+        .populate('createdBy', '_id name image')
         const updatedUser = await User.findByIdAndUpdate(joinedBy, {$push: {joinedActivities : activityID}},{new:true})
         res.json(updatedActivity)
     } catch (error) {
@@ -122,7 +124,8 @@ router.get('/activities/:activityID/leave', isAuthenticated, async (req,res,next
     try {
         const updatedActivity = await Activity.findByIdAndUpdate(activityID, {$pull: {members: leftBy}}, {new:true})
         .populate('members', '_id name image')
-        .populate('createdBy')
+        .populate('sport')
+        .populate('createdBy', '_id name image')
         const updatedUser = await User.findByIdAndUpdate(leftBy, {$pull : {joinedActivities : activityID}})
         res.json(updatedActivity)
     } catch (error) {
