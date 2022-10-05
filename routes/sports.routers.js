@@ -35,6 +35,24 @@ router.get('/sports/:sportID', (req, res ) => {
     
     Sport.findById(sportID)
         .populate('activities')
+        .populate({
+            path: "activities",
+            populate: [
+              {
+                path: "members",
+                model: "User",
+              },
+              {
+                path: "createdBy",
+                model: "User",
+              },
+              {
+                path: "sport",
+                model: "Sport",
+              },
+            ],
+          })
+
         .then(sport => res.json(sport))
         .catch(err => console.log(err))
 })
