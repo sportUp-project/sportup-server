@@ -29,38 +29,38 @@ router.get("/:userId", isAuthenticated, (req, res, next) => {
   User.findById(userId)
     .populate("sports")
     .populate({
-        path: 'joinedActivities',
-        populate: [
-            {
-                path: "sport",
-                model: "Sport",
-            },
-            {
-                path: "members",
-                model: "User"
-            },
-            {
-                path: 'createdBy',
-                model: "User"
-            }
-        ]
+      path: "joinedActivities",
+      populate: [
+        {
+          path: "sport",
+          model: "Sport",
+        },
+        {
+          path: "members",
+          model: "User",
+        },
+        {
+          path: "createdBy",
+          model: "User",
+        },
+      ],
     })
     .populate({
-        path: 'userActivities',
-        populate: [
-            {
-                path: "sport",
-                model: "Sport",
-            },
-            {
-                path: "members",
-                model: "User"
-            },
-            {
-                path: 'createdBy',
-                model: "User"
-            }
-        ]
+      path: "userActivities",
+      populate: [
+        {
+          path: "sport",
+          model: "Sport",
+        },
+        {
+          path: "members",
+          model: "User",
+        },
+        {
+          path: "createdBy",
+          model: "User",
+        },
+      ],
     })
     .populate("follows", "_id image name")
     .populate("followers", "_id image name")
@@ -199,7 +199,30 @@ router.put("/:userId/follow", isAuthenticated, (req, res, next) => {
         { $push: { followers: authID } },
         { new: true }
       )
-        .populate("followers")
+        .populate("followers", '_id name image')
+        .populate("sports")
+        .populate({path: 'joinedActivities',
+        populate: [
+            {
+                path: "sport",
+                model: "Sport"
+            },
+            {
+                path: 'members', 
+                model: 'User'
+            }
+        ] })
+        .populate({path: 'userActivities',
+            populate: [
+                {
+                    path: "sport",
+                    model: "Sport"
+                },
+                {
+                    path: 'members', 
+                    model: 'User'
+                }
+            ] })
         .then((updatedUser) => {
           res.json(updatedUser);
         });
@@ -226,7 +249,30 @@ router.put("/:userId/unfollow", isAuthenticated, (req, res, next) => {
         { $pull: { followers: authID } },
         { new: true }
       )
-        .populate("followers")
+        .populate("followers", '_id name image')
+        .populate("sports")
+        .populate({path: 'joinedActivities',
+            populate: [
+                {
+                    path: "sport",
+                    model: "Sport"
+                },
+                {
+                    path: 'members', 
+                    model: 'User'
+                }
+            ] })
+        .populate({path: 'userActivities',
+        populate: [
+            {
+                path: "sport",
+                model: "Sport"
+            },
+            {
+                path: 'members', 
+                model: 'User'
+            }
+        ] })
         .then((updatedUser) => res.json(updatedUser));
     })
     .catch((err) => console.log(err));
