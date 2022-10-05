@@ -116,10 +116,34 @@ router.get("/:userId/following", isAuthenticated, (req, res, next) => {
         },
         {
           path: "joinedActivities",
+          populate: [{
+            path: "sport",
+            model: "Sport"
+          },{
+            path: "createdBy",
+            model: "User"
+          },{
+
+              path:'members',
+              model:'User'
+            }
+        ],
           model: "Activity",
         },
         {
           path: "userActivities",
+          populate: [{
+            path: "sport",
+            model: "Sport"
+          },{
+            path: "createdBy",
+            model: "User"
+          },{
+
+              path:'members',
+              model:'User'
+            }
+        ],
           model: "Activity",
         },
       ],
