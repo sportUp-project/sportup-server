@@ -22,7 +22,6 @@ router.get('/activities', (req, res ) => {
 router.post('/activities', isAuthenticated, (req, res, next) => {
     const { name, description, duration, activityDate, location, sport } = req.body
     const createdBy = req.payload._id
-    //console.log(createdBy)
     if (name === '' || activityDate === '') {
         res.status(400).json({ message: "Provide name, date and place." });
         return;

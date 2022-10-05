@@ -193,7 +193,6 @@ router.put("/:userId", isAuthenticated, (req, res, next) => {
   const convertedSposrts = sports.map((sport) =>
     mongoose.Types.ObjectId(sport)
   );
-  //const dbSport = Sports.findOne({ sports  }) // { _id,  }
   User.findByIdAndUpdate(
     userId,
     { name, image, description, sports: convertedSposrts },
@@ -254,7 +253,6 @@ router.put("/:userId/follow", isAuthenticated, (req, res, next) => {
     .catch((err) => console.log(err));
 });
 //path to add to a friend when in the other user profil
-// AUTHORIZATION DO NOT WORK WHEN CONNECTDRD WITH CLIENT SIDE
 router.put("/:userId/unfollow", isAuthenticated, (req, res, next) => {
   const { userId } = req.params;
   const authID = req.payload._id; //req.payload._id
@@ -307,13 +305,13 @@ router.delete("/:userId", isAuthenticated, checkAdmin, (req, res) => {
   const { userId } = req.params;
   User.findByIdAndRemove(userId)
     .then((user) => {
-      //console.log(user.userActivities)
+
       const removeActivities = Activity.deleteMany({
         _id: user.userActivities,
       });
 
       const sportActivities = user.userActivities.map((activity) => {
-        //console.log(activity)
+
         Sport.findOneAndUpdate(
           { activities: activity },
           { $pull: { activities: activity } }

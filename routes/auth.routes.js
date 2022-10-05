@@ -33,7 +33,6 @@ router.post('/signup', (req,res,next) => {
       }
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
-      // console.log({ email, password: hashedPassword, name })
       return User.create({ email, password: hashedPassword, name, image: 'https://res.cloudinary.com/dxc2oj7lt/image/upload/v1664812327/sportUp-users-gallery/pngfind.com-default-image-png-6764065_ciulpf.png' });
     })
     .then((createdUser) => {
@@ -61,7 +60,7 @@ router.post('/login', (req,res,next) => {
         res.status(401).json({ message: "User not found." })
         return;
       }  
-      console.log(foundUser)
+
       const passwordCorrect = bcrypt.compareSync(password, foundUser.password);
       if (passwordCorrect) {      
         const { _id, email, name, isAdmin, userActivities, joinedActivities  } = foundUser;      
