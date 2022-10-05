@@ -75,6 +75,7 @@ router.get('/activities/:activityID/edit', isAuthenticated, (req,res,next) => {
         return;
     };   
     Activity.findById(activityID)
+    .populate('members', '_id name image')
     .then(foundActivity => {
         if(foundActivity.createdBy.valueOf() !== req.payload._id) {
             res.status(401).json({ message: "Wrong credentials" });
