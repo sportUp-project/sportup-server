@@ -12,7 +12,7 @@ const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
 
-router.get("/users", (req, res) => {
+router.get("/users", isAuthenticated, (req, res) => {
   User.find()
     .then((foundUsers) => res.json( foundUsers ))
     .catch(err => console.log(err))
