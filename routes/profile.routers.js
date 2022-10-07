@@ -12,6 +12,13 @@ const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
 
+router.get("/users", (req, res) => {
+  User.find()
+    .then((foundUsers) => res.json( foundUsers ))
+    .catch(err => console.log(err))
+});
+
+
 router.post("/upload", fileUploader.single("image"), (req, res, next) => {
   if (!req.file) {
     next(new Error("No file uploaded!"));
@@ -324,5 +331,8 @@ router.delete("/:userId", isAuthenticated, checkAdmin, (req, res) => {
     })
     .catch((err) => console.log(err));
 });
+
+
+
 
 module.exports = router;
